@@ -107,6 +107,11 @@ def reserve_pc1(conn, request_id, holder, generation, binding, *, csr_der=None, 
         context = conn.execute("SELECT current_setting('inv.tenant_id',true)").fetchone()[0]
         if context != str(tenant):
             return "HOLD_AUTHORITY_UNAVAILABLE"
+        fenced = conn.execute("SELECT * FROM fleet_writer.lock_holder(%s)", (tenant,)).fetchone()
+        if fenced is None:
+            return "HOLD_AUTHORITY_UNAVAILABLE"
+        if fenced != (holder, generation):
+            return "HOLD_WRITER_FENCE"
         authority = lock_authority(conn, tenant)
         if authority is None:
             return "HOLD_AUTHORITY_UNAVAILABLE"
@@ -131,13 +136,19 @@ def reserve_pc1(conn, request_id, holder, generation, binding, *, csr_der=None, 
         """, receipt).fetchone()
         if created:
             conn.execute("""
+                INSERT INTO fleet_writer.journal
+                    (tenant_id,operation_id,kind,holder,generation,manifest_digest,digest)
+                VALUES (%s,%s,'E1',%s,%s,%s,%s)
+            """, (tenant, operation, holder, generation, manifest, digest))
+            conn.execute("""
                 INSERT INTO e1.reservation_audit (tenant_id,operation_id,manifest_digest,digest)
                 VALUES (%s,%s,%s,%s)
             """, (tenant, operation, manifest, digest))
         exact = conn.execute("""
             SELECT 1 FROM e1.reservations r JOIN e1.reservation_audit a
                 USING (tenant_id, operation_id, manifest_digest, digest)
-            WHERE tenant_id=%s AND node_id=%s AND request_id=%s AND holder=%s
+            JOIN fleet_writer.journal j USING (tenant_id,operation_id,manifest_digest,digest,holder,generation)
+            WHERE j.kind='E1' AND tenant_id=%s AND node_id=%s AND request_id=%s AND holder=%s
               AND generation=%s AND binding=%s AND digest=%s AND public_key_sha256=%s
               AND manifest_digest=%s AND operation_id=%s
         """, receipt).fetchone()
@@ -160,17 +171,20 @@ def reconcile_pc1(conn, request_id, holder, generation, binding, public_key, man
     with conn.transaction():
         conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
         context = conn.execute("SELECT current_setting('inv.tenant_id',true)").fetchone()[0]
-        if context != binding["tenantID"]:
+        if (context != binding["tenantID"] or conn.execute(
+                "SELECT fleet_writer.authenticated_tenant()::text").fetchone()[0] != context):
             return "HOLD_AUTHORITY_UNAVAILABLE"
         row = conn.execute("""
             SELECT r.request_id::text,r.holder,r.generation,r.binding,r.digest,r.public_key_sha256,
-                   r.manifest_digest,r.operation_id,a.digest
+                   r.manifest_digest,r.operation_id,a.digest,j.kind
             FROM e1.reservations r LEFT JOIN e1.reservation_audit a
               USING (tenant_id,operation_id,manifest_digest,digest)
+            LEFT JOIN fleet_writer.journal j
+              USING (tenant_id,operation_id,manifest_digest,digest,holder,generation)
             WHERE tenant_id=%s AND pc='PC1'
         """, (context,)).fetchone()
         if row is None:
             return "UNKNOWN_RECONCILE_REQUIRED"
         expected = (request_id, holder, generation, binding, digest, public_key,
-                    manifest, operation, digest)
+                    manifest, operation, digest, "E1")
         return "COMMITTED" if row == expected else "HOLD_RESERVATION_MISMATCH"

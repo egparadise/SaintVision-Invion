@@ -29,10 +29,24 @@ def test_missing_authority():
     assert reserve_pc1(None, None, None, None, None) == "HOLD_AUTHORITY_UNAVAILABLE"
 
 
-def test_pc1_transactions():
-    dsn = os.environ.get("E1_DISPOSABLE_PG_DSN")
-    if not dsn:
-        pytest.skip("requires a fresh disposable PostgreSQL database")
+@pytest.fixture
+def e1_database(request):
+    explicit = os.environ.get("E1_DISPOSABLE_PG_DSN")
+    if explicit:
+        yield explicit
+        return
+    admin = request.getfixturevalue("test_admin_dsn")
+    name = "e1_test_" + uuid4().hex
+    with psycopg.connect(admin, autocommit=True) as setup:
+        setup.execute(psycopg.sql.SQL("CREATE DATABASE {}").format(psycopg.sql.Identifier(name)))
+        try:
+            yield psycopg.conninfo.make_conninfo(admin, dbname=name)
+        finally:
+            setup.execute(psycopg.sql.SQL("DROP DATABASE {}").format(psycopg.sql.Identifier(name)))
+
+
+def test_pc1_transactions(e1_database):
+    dsn = e1_database
     binding = json.loads((CONTRACT / "p14-reservation.json").read_text())
     inputs = json.loads((CONTRACT / "p14-inputs.json").read_text())
     binding["rowsReadbackSHA256"] = canonical_digest(inputs["rows"])
@@ -59,6 +73,8 @@ def test_pc1_transactions():
             conn.execute("""CREATE TABLE e1.test_authority (
                 tenant_id uuid PRIMARY KEY, holder text, generation bigint, binding jsonb, evidence jsonb,
                 read_at timestamptz DEFAULT now(), expires_at timestamptz DEFAULT now()+interval '2 minutes')""")
+            conn.execute("INSERT INTO fleet_writer.principals VALUES (session_user,%s)", (tenant,))
+            conn.execute("INSERT INTO fleet_writer.authority VALUES (%s,session_user,'first',1)", (tenant,))
         def membership():
             return [conn.execute("SELECT * FROM inv." + table).fetchall()
                     for table in ("nodes", "node_channels", "node_channel_audit", "resources")]
@@ -73,6 +89,7 @@ def test_pc1_transactions():
                 raise RuntimeError("rollback")
         assert conn.execute("SELECT count(*) FROM e1.reservations").fetchone() == (0,)
         assert conn.execute("SELECT count(*) FROM e1.reservation_audit").fetchone() == (0,)
+        assert conn.execute("SELECT count(*) FROM fleet_writer.journal").fetchone() == (0,)
         reads = []
         def expires_before_commit(connection, scope):
             reads.append(scope)
@@ -99,6 +116,17 @@ def test_pc1_transactions():
                               else {"HOLD_RESERVATION_MISMATCH"})
         assert reserve(conn, winner) == "EXACT_RETRY"
         with conn.transaction(force_rollback=True):
+            with pytest.raises(psycopg.errors.RaiseException, match="immutable"), conn.transaction():
+                conn.execute("TRUNCATE fleet_writer.journal")
+            # Simulate historic corruption inside a rolled-back, owner-only fixture.
+            conn.execute("ALTER TABLE fleet_writer.journal DISABLE TRIGGER immutable_truncate")
+            conn.execute("TRUNCATE fleet_writer.journal")
+            assert reserve(conn, winner) == "HOLD_RESERVATION_MISMATCH"
+        with conn.transaction(force_rollback=True):
+            with pytest.raises(psycopg.errors.RaiseException, match="immutable"), conn.transaction():
+                conn.execute("TRUNCATE e1.reservation_audit")
+            # Simulate historic corruption inside a rolled-back, owner-only fixture.
+            conn.execute("ALTER TABLE e1.reservation_audit DISABLE TRIGGER immutable_truncate")
             conn.execute("TRUNCATE e1.reservation_audit")
             assert reserve(conn, winner) == "HOLD_RESERVATION_MISMATCH"
             assert conn.execute("SELECT count(*) FROM e1.reservation_audit").fetchone() == (0,)
@@ -115,6 +143,7 @@ def test_pc1_transactions():
         # Even when the new body is authorized, the durable request cannot change.
         conn.execute("UPDATE e1.test_authority SET binding=%s", (psycopg.types.json.Jsonb(changed),))
         assert reserve(conn, winner, body=changed) == "HOLD_RESERVATION_MISMATCH"
+        conn.execute("UPDATE fleet_writer.authority SET holder='second',generation=2")
         conn.execute("UPDATE e1.test_authority SET holder='second',generation=2")
         assert reserve(conn, winner) == "HOLD_WRITER_FENCE"
         assert reserve(conn, winner, writer="second") == "HOLD_WRITER_FENCE"
@@ -132,7 +161,7 @@ def test_pc1_transactions():
 
             with ThreadPoolExecutor(1) as workers:
                 with conn.transaction():
-                    conn.execute("UPDATE e1.test_authority SET generation=3")
+                    conn.execute("UPDATE fleet_writer.authority SET generation=3")
                     pending = workers.submit(stale_retry)
                     assert entered.wait(5)
                     deadline = time.monotonic() + 5
@@ -150,6 +179,9 @@ def test_pc1_transactions():
             conn.execute(psycopg.sql.SQL("CREATE ROLE {}").format(role))
             conn.execute(psycopg.sql.SQL("GRANT USAGE ON SCHEMA e1 TO {}").format(role))
             conn.execute(psycopg.sql.SQL("GRANT SELECT, INSERT ON ALL TABLES IN SCHEMA e1 TO {}").format(role))
+            conn.execute(psycopg.sql.SQL("GRANT USAGE ON SCHEMA fleet_writer TO {}").format(role))
+            conn.execute(psycopg.sql.SQL("GRANT EXECUTE ON FUNCTION fleet_writer.authenticated_tenant(), fleet_writer.lock_holder(uuid) TO {}").format(role))
+            conn.execute(psycopg.sql.SQL("GRANT SELECT ON fleet_writer.journal TO {}").format(role))
             conn.execute(psycopg.sql.SQL("SET LOCAL ROLE {}").format(role))
             conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (str(uuid4()),))
             for table in ("reservations", "reservation_audit"):
@@ -160,6 +192,16 @@ def test_pc1_transactions():
             conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (tenant,))
             for table in ("reservations", "reservation_audit"):
                 assert conn.execute("SELECT count(*) FROM e1." + table).fetchone() == (1,)
+            conn.execute(psycopg.sql.SQL("SET LOCAL SESSION AUTHORIZATION {}").format(role))
+            assert not conn.execute("SELECT * FROM fleet_writer.lock_holder(%s)", (tenant,)).fetchall()
+            for table in ("e1.reservations", "e1.reservation_audit", "fleet_writer.journal"):
+                assert not conn.execute("SELECT 1 FROM " + table).fetchall()
+        with pytest.raises(psycopg.errors.RaiseException, match="stale writer"), conn.transaction():
+            conn.execute("""INSERT INTO fleet_writer.journal
+                         VALUES (%s,'stale','E1','first',1,%s,%s)""",
+                         (tenant, "a"*64, "b"*64))
+        assert conn.execute("SELECT count(*) FROM fleet_writer.journal").fetchone() == (1,)
+
 
 
 @pytest.mark.parametrize("case", ["retired-key", "disabled-node", "rotation-key", "stale-digest",
