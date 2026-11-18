@@ -1,10 +1,10 @@
 ---
 doc_id: "HISTORY-FLEET5-A1-RUNTIME-FENCE"
 title: "Interrupted A1 runtime fence prerequisite"
-version: "1.0.2"
+version: "1.0.3"
 status: "review"
 author: "Codex"
-updated: "2026-11-19T04:45:50+09:00"
+updated: "2026-11-19T05:40:28.8483251+09:00"
 source_of_truth: "Git"
 ---
 
@@ -41,3 +41,9 @@ Codex task_a5a7ea66e8f6, agent/codex/fleet5-runtime-a1-986a845b, review base 055
 Claude owns independent retry review. Codex retains two open implementation items: fleet-wide writer enforcement and the authoritative signer ceremony ledger. Root owns operational integration. Inspection remains HOLD-only.
 
 Local validation on Windows, Python 3.14.7, 2026-11-19 04:44–04:46 KST: reran each of the ten commands listed in Evidence/fleet5-a1-runtime-fence/local-gates.json with immediate exit checks, adding tests/test_intranet_pki.py to pytest. All exited 0. Pytest passed 505 cases including a subprocess that exits after commit, concurrent identical requests and stale retries after a later transfer. Sync check found 33 pending exports and zero conflicts. Shared vault export is deferred to integration.
+
+## Local signer ceremony evidence, 2026-11-19 KST
+
+Codex task_b51f6917ccef started at 05:38 KST on agent/codex/fleet5-runtime-a1-986a845b, clean 9e2142a9, then fast-forwarded to Claude's independent acceptance 4fdc9a33. Input boards INDEX-PROGRESS-001 1.0.550 and WORKBOARD-CODEX-001 1.0.509. Synthetic events in the local SQLite writer ledger bind a stable event ID, subject and fingerprint to the R2 plan. Snapshot readback requires the planned CA and every planned leaf. Missing or conflicting evidence rejects readback. Activation remains HOLD. Claude owns independent review, Codex owns fleet-wide writer enforcement, and Root owns signer custody, operational integration and canonical vault export.
+
+Windows local verification recorded all ten command exits as zero in Evidence/fleet5-a1-ceremony-ledger/local-gates.json. 508 passed in 22.76s. Sync check exited zero. Hosted CI and independent review are separate acceptance steps.
