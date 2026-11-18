@@ -27,9 +27,9 @@ MAX_BYTES = 65536
 MAX_INT = 9007199254740991
 AUTH = b"saintvision/expired-policy/authorization/v1\0"
 OPERATOR = b"saintvision/expired-policy/operator-custody/v1\0"
-PROOF = b"saintvision/expired-policy/nonserving-proof/v1\0"
+PROOF = b"saintvision/expired-policy/nonserving-proof/v2\0"
 ACK = b"saintvision/expired-policy/checkpoint-request/v1\0"
-CHECKPOINT = b"saintvision/expired-policy/candidate-checkpoint/v1\0"
+CHECKPOINT = b"saintvision/expired-policy/candidate-checkpoint/v2\0"
 SITES = frozenset({"observer_worker.py:58", "worker.py:122", "workspace_config.py:54",
                    "build_product_runtime.py:537", "storage_check_collect.py:381"})
 HEX = re.compile(r"[0-9a-f]{64}\Z")
@@ -41,12 +41,12 @@ MEMBER_KEYS = frozenset({"nodeId", "ip", "nodeFingerprint", "priorC", "targetC",
     "floorSHA256", "identitySHA256", "policySHA256", "configDigest", "previousCheckpoint", "priorPolicyExpiresAt"})
 OPERATOR_KEYS = frozenset({"schema", "role", "proposalDigest", "nodeId", "containerId", "imageId",
     "helperSHA256", "UID", "lockDevice", "lockInode", "contextsDigest", "issuedAt", "deadline"})
-PROOF_KEYS = frozenset({"schema", "assurance", "serving", "servingPID", "operation", "nonce", "counter",
+PROOF_KEYS = frozenset({"authorizerSHA256", "operatorSHA256", "schema", "assurance", "serving", "servingPID", "operation", "nonce", "counter",
     "tenantId", "epoch", "nodeId", "proposalDigest", "requestDigest", "operatorDigest", "helperSHA256",
     "containerId", "imageId", "lockDevice", "lockInode", "lockHeldAtSigning", "observedAt", "deadline",
     "priorP", "priorC", "floorSHA256", "identitySHA256", "configDigest", "previousCheckpoint", "activationAllowed"})
 ACK_KEYS = frozenset({"schema", "role", "operation", "proposalDigest", "proofDigest", "batchProofDigest", "counter", "deadline"})
-CHECKPOINT_KEYS = frozenset({"schema", "operation", "counter", "requestDigest", "proofDigest", "ackDigest",
+CHECKPOINT_KEYS = frozenset({"authorizerSHA256", "operatorSHA256", "schema", "operation", "counter", "requestDigest", "proofDigest", "ackDigest",
     "batchProofDigest", "previousCheckpoint", "nodeId", "tenantId", "epoch", "checkpointAt", "lockHeldThroughCheckpoint", "activationAllowed"})
 
 
@@ -250,6 +250,11 @@ def authorization(envelope, trust):
     return body, raw, certificates
 
 
+def authority_hashes(trust):
+    return {"authorizerSHA256": sha(trust.authorizer.public_bytes_raw()),
+            "operatorSHA256": sha(trust.operator.public_bytes_raw())}
+
+
 def verify_proofs(auth_envelope, requests, proofs, trust):
     auth, raw, certificates = authorization(auth_envelope, trust)
     require(set(requests) == set(proofs) == set(trust.nodes), "RECOVERY_MEMBERS")
@@ -266,8 +271,8 @@ def verify_proofs(auth_envelope, requests, proofs, trust):
         proof, _ = verify(proofs[node], PROOF, certificates[node].public_key())
         closed(proof, PROOF_KEYS, "RECOVERY_PROOF_SHAPE")
         require(all(number(proof[k]) for k in ['counter','lockDevice','lockInode','observedAt','deadline','priorP','priorC']), 'RECOVERY_PROOF_SHAPE')
-        require(proof['schema'] == 'sv-expired-policy-nonserving-proof:1' and proof['serving'] is False and proof['servingPID'] is None and proof['assurance'] == 'operator-custody-and-file-lock-not-hardware' and proof['activationAllowed'] is False and proof['lockHeldAtSigning'] is True, "RECOVERY_NOT_LIVE_M2")
-        expected = {'operation':auth['operation'],'nonce':auth['nonce'],'counter':auth['counter'],'tenantId':trust.tenant,'epoch':trust.epoch,'nodeId':node,'proposalDigest':sha(raw),'requestDigest':sha(requests[node]),'operatorDigest':sha(opraw),'helperSHA256':trust.helper_sha256,'deadline':auth['deadline']}
+        require(proof['schema'] == 'sv-expired-policy-nonserving-proof:2' and proof['serving'] is False and proof['servingPID'] is None and proof['assurance'] == 'operator-custody-and-file-lock-not-hardware' and proof['activationAllowed'] is False and proof['lockHeldAtSigning'] is True, "RECOVERY_NOT_LIVE_M2")
+        expected = {**authority_hashes(trust),'operation':auth['operation'],'nonce':auth['nonce'],'counter':auth['counter'],'tenantId':trust.tenant,'epoch':trust.epoch,'nodeId':node,'proposalDigest':sha(raw),'requestDigest':sha(requests[node]),'operatorDigest':sha(opraw),'helperSHA256':trust.helper_sha256,'deadline':auth['deadline']}
         expected.update({k:operator[k] for k in ['containerId','imageId','lockDevice','lockInode']})
         expected.update({k:member[k] for k in ['priorC','priorP','floorSHA256','identitySHA256','configDigest','previousCheckpoint']})
         require(all(proof[k] == v for k,v in expected.items()), "RECOVERY_PROOF_BINDING")
@@ -311,7 +316,7 @@ class CandidateLedger:
         with sqlite3.connect(path, isolation_level=None) as db:
             db.execute('PRAGMA synchronous=FULL')
             db.execute('CREATE TABLE metadata(name TEXT PRIMARY KEY,value TEXT NOT NULL)')
-            db.executescript('CREATE TABLE nodes(node TEXT PRIMARY KEY,c INTEGER NOT NULL,p INTEGER NOT NULL); CREATE TABLE operations(op TEXT PRIMARY KEY,nonce TEXT UNIQUE NOT NULL,digest TEXT NOT NULL,counter INTEGER UNIQUE NOT NULL,phase TEXT NOT NULL,batch TEXT NOT NULL,receipt BLOB); CREATE TABLE audit(op TEXT NOT NULL,node TEXT NOT NULL,c INTEGER NOT NULL,p INTEGER NOT NULL,digest TEXT NOT NULL,PRIMARY KEY(op,node));')
+            db.executescript('CREATE TABLE nodes(node TEXT PRIMARY KEY,c INTEGER NOT NULL,p INTEGER NOT NULL); CREATE TABLE operations(op TEXT PRIMARY KEY,nonce TEXT UNIQUE NOT NULL,digest TEXT NOT NULL,counter INTEGER UNIQUE NOT NULL,phase TEXT NOT NULL,batch TEXT NOT NULL,receipt BLOB,deadline INTEGER NOT NULL); CREATE TABLE audit(op TEXT NOT NULL,node TEXT NOT NULL,c INTEGER NOT NULL,p INTEGER NOT NULL,digest TEXT NOT NULL,PRIMARY KEY(op,node));')
             for node,(c,p) in initial.items():
                 require(number(c,1) and number(p,1), "RECOVERY_GENERATIONS")
                 db.execute('INSERT INTO nodes VALUES(?,?,?)',(node,c,p))
@@ -331,7 +336,7 @@ class CandidateLedger:
             scope=db.execute("SELECT name,value FROM metadata").fetchall()
         except sqlite3.DatabaseError:
             db.close(); raise Refusal('RECOVERY_HOLD_LEDGER_SCOPE') from None
-        if scope != [('scope',self.scope_digest())]:
+        if scope != [('scope',self.scope_digest())] or 'deadline' not in {row[1] for row in db.execute('PRAGMA table_info(operations)')}:
             db.close(); raise Refusal('RECOVERY_HOLD_LEDGER_SCOPE')
         return db
 
@@ -351,8 +356,11 @@ class CandidateLedger:
                     for m in auth['members']:
                         require(db.execute('SELECT c,p FROM nodes WHERE node=?',(m['nodeId'],)).fetchone() == (m['priorC'],m['priorP']), "RECOVERY_CAS_CONFLICT")
                     require(db.execute('SELECT 1 FROM operations WHERE nonce=?',(auth['nonce'],)).fetchone() is None, 'RECOVERY_REPLAY_MISMATCH')
-                    require(db.execute("SELECT 1 FROM operations WHERE phase='PREPARED'").fetchone() is None, 'RECOVERY_HOLD_PENDING_OPERATION')
-                    db.execute('INSERT INTO operations VALUES(?,?,?,?,?,?,NULL)',(auth['operation'],auth['nonce'],sha(raw),auth['counter'],'PREPARED',batch))
+                    pending = db.execute("SELECT deadline FROM operations WHERE phase='PREPARED' ORDER BY deadline LIMIT 1").fetchone()
+                    if pending:
+                        require(pending[0] > int(time.time()), 'EXPIRED_PREPARED_REQUIRES_FORWARD_RECONCILIATION')
+                        raise Refusal('RECOVERY_HOLD_PENDING_OPERATION')
+                    db.execute('INSERT INTO operations VALUES(?,?,?,?,?,?,NULL,?)',(auth['operation'],auth['nonce'],sha(raw),auth['counter'],'PREPARED',batch,auth['deadline']))
                 db.commit()
             except Exception:
                 db.rollback(); raise
@@ -365,7 +373,7 @@ class CandidateLedger:
         for m in auth['members']:
             node = m['nodeId']; record = records[node]
             closed(record, {'schema','requestDigest','proof','checkpoint'}, "RECOVERY_CHECKPOINT_SHAPE")
-            require(record['schema'] == 'sv-expired-policy-record:1' and record['proof'] == proofs[node] and record['requestDigest'] == sha(requests[node]), "RECOVERY_REPLAY_MISMATCH")
+            require(record['schema'] == 'sv-expired-policy-record:2' and record['proof'] == proofs[node] and record['requestDigest'] == sha(requests[node]), "RECOVERY_REPLAY_MISMATCH")
             ack, _ = verify(acknowledgements[node],ACK,self.trust.authorizer)
             closed(ack,ACK_KEYS,"RECOVERY_CHECKPOINT_AUTHORIZATION")
             require(number(ack['counter'],1) and number(ack['deadline']), 'RECOVERY_CHECKPOINT_AUTHORIZATION')
@@ -374,7 +382,7 @@ class CandidateLedger:
             cp, _ = verify(record['checkpoint'],CHECKPOINT,certificates[node].public_key())
             closed(cp,CHECKPOINT_KEYS,"RECOVERY_CHECKPOINT_SHAPE")
             require(number(cp['counter'],1) and number(cp['checkpointAt']) and cp['lockHeldThroughCheckpoint'] is True and cp['activationAllowed'] is False, 'RECOVERY_CHECKPOINT_SHAPE')
-            expected = {'schema':'sv-expired-policy-candidate-checkpoint:1','operation':auth['operation'],'counter':auth['counter'],'requestDigest':sha(requests[node]),'proofDigest':sha(canonical(proofs[node])),'ackDigest':sha(canonical(acknowledgements[node])),'batchProofDigest':batch,'previousCheckpoint':m['previousCheckpoint'],'nodeId':node,'tenantId':self.trust.tenant,'epoch':self.trust.epoch,'lockHeldThroughCheckpoint':True,'activationAllowed':False}
+            expected = {**authority_hashes(self.trust),'schema':'sv-expired-policy-candidate-checkpoint:2','operation':auth['operation'],'counter':auth['counter'],'requestDigest':sha(requests[node]),'proofDigest':sha(canonical(proofs[node])),'ackDigest':sha(canonical(acknowledgements[node])),'batchProofDigest':batch,'previousCheckpoint':m['previousCheckpoint'],'nodeId':node,'tenantId':self.trust.tenant,'epoch':self.trust.epoch,'lockHeldThroughCheckpoint':True,'activationAllowed':False}
             require(all(cp[k] == v for k,v in expected.items()) and number(cp['checkpointAt']) and auth['issuedAt']-30 <= cp['checkpointAt'] < auth['deadline'], "RECOVERY_CHECKPOINT_BINDING")
         receipt = canonical({'schema':'sv-expired-policy-reference-result:1','operation':auth['operation'],'proposalDigest':sha(raw),'phase':'CANDIDATE_COMMITTED','activationAllowed':False,'liveIntegration':'HOLD_INTEGRATION_NOT_BOUND','recordsDigest':sha(canonical(records))})
         with self.connect() as db:
@@ -386,6 +394,7 @@ class CandidateLedger:
                     require(row[3] == receipt, "RECOVERY_REPLAY_MISMATCH")
                     db.commit(); return parse(row[3])
                 require(row[1] == 'PREPARED', "RECOVERY_UNKNOWN_PHASE")
+                require(int(time.time()) < auth['deadline'], 'EXPIRED_PREPARED_REQUIRES_FORWARD_RECONCILIATION')
                 for m in auth['members']:
                     changed = db.execute('UPDATE nodes SET c=?,p=? WHERE node=? AND c=? AND p=?',(m['targetC'],m['targetP'],m['nodeId'],m['priorC'],m['priorP'])).rowcount
                     require(changed == 1,"RECOVERY_CAS_CONFLICT")
@@ -407,9 +416,11 @@ class CandidateLedger:
         """
         require(type(operation) is str and OPID.fullmatch(operation) and type(proposal_digest) is str and HEX.fullmatch(proposal_digest), 'RECOVERY_SCOPE')
         with self.connect() as db:
-            row=db.execute('SELECT digest,phase,receipt FROM operations WHERE op=?',(operation,)).fetchone()
+            row=db.execute('SELECT digest,phase,receipt,deadline FROM operations WHERE op=?',(operation,)).fetchone()
         require(row is not None and row[0] == proposal_digest, 'RECOVERY_UNKNOWN_OUTCOME')
         require(row[1] in {'PREPARED','CANDIDATE_COMMITTED'}, 'RECOVERY_UNKNOWN_PHASE')
+        if row[1] == 'PREPARED' and row[3] <= int(time.time()):
+            raise Refusal('EXPIRED_PREPARED_REQUIRES_FORWARD_RECONCILIATION')
         return {'phase':row[1], 'receipt':parse(row[2]) if row[2] is not None else None,
                 'historicalOnly':True, 'activationAllowed':False}
 

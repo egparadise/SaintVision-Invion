@@ -170,7 +170,7 @@ def test_partial_record_and_replayed_nonce_are_not_success(tmp_path):
 def test_proposed_schema_closed_shapes_and_actual_signed_payloads():
     import json
     from jsonschema import Draft202012Validator
-    schema=json.loads((Path(__file__).parents[2]/'contracts/proposed/expired-policy-custody-v1.schema.json').read_text())
+    schema=json.loads((Path(__file__).parents[2]/'contracts/proposed/expired-policy-custody-v2.schema.json').read_text())
     Draft202012Validator.check_schema(schema)
     for name,keys in [('auth',r.AUTH_KEYS),('member',r.MEMBER_KEYS),('operator',r.OPERATOR_KEYS),('proof',r.PROOF_KEYS),('ack',r.ACK_KEYS),('checkpoint',r.CHECKPOINT_KEYS)]:
         assert set(schema['$defs'][name]['required'])==keys
@@ -200,3 +200,25 @@ def test_existing_reference_ledger_cannot_be_rebound_to_other_authority(tmp_path
     # Positive control on the same untouched ledger, with otherwise identical
     # Node names/C/P, proves the refusal was not setup/table/EXECUTE failure.
     assert ledger.prepare(env,req,proof)['phase']=='PREPARED'
+
+def test_prepared_expiry_requires_original_forward_reconciliation(tmp_path, monkeypatch):
+    f=Fixture()
+    auth,env=f.authorization()
+    req,proof=f.reference_proofs(auth,env)
+    path=tmp_path/'ledger'
+    ledger=r.CandidateLedger.create_reference(path,f.trust,{m['nodeId']:(m['priorC'],m['priorP']) for m in auth['members']})
+    ledger.prepare(env,req,proof)
+    before=path.read_bytes()
+    monkeypatch.setattr(r.time,"time",lambda:auth['deadline']+1)
+    refused("EXPIRED_PREPARED_REQUIRES_FORWARD_RECONCILIATION",lambda:ledger.reconcile(auth['operation'],r.sha(r.canonical(auth))))
+    second,env2=f.authorization(counter=2)
+    req2,proof2=f.reference_proofs(second,env2)
+    refused("EXPIRED_PREPARED_REQUIRES_FORWARD_RECONCILIATION",lambda:ledger.prepare(env2,req2,proof2))
+    assert before==path.read_bytes()
+
+@pytest.mark.parametrize("value,accepted",[(2**53-1,True),(2**53,False),(2**53+1,False),(2**64-1,False)])
+def test_filesystem_numbers_keep_wire_range(value,accepted):
+    if accepted:
+        assert r.parse(r.canonical({"lockInode":value}))["lockInode"]==value
+    else:
+        refused("RECOVERY_WIRE_NUMBER",lambda:r.parse(("{\"lockInode\":"+str(value)+"}").encode()))

@@ -22,9 +22,9 @@ import (
 const MaxBytes = 65536
 const AuthorizationDomain = "saintvision/expired-policy/authorization/v1\x00"
 const OperatorDomain = "saintvision/expired-policy/operator-custody/v1\x00"
-const ProofDomain = "saintvision/expired-policy/nonserving-proof/v1\x00"
+const ProofDomain = "saintvision/expired-policy/nonserving-proof/v2\x00"
 const AckDomain = "saintvision/expired-policy/checkpoint-request/v1\x00"
-const CheckpointDomain = "saintvision/expired-policy/candidate-checkpoint/v1\x00"
+const CheckpointDomain = "saintvision/expired-policy/candidate-checkpoint/v2\x00"
 
 type Refusal string
 
@@ -32,6 +32,7 @@ func (e Refusal) Error() string { return string(e) }
 
 func refuse(code string) error { return Refusal(code) }
 
+var signatureHex = regexp.MustCompile(`^[0-9a-f]{128}$`)
 var hex64 = regexp.MustCompile(`^[0-9a-f]{64}$`)
 var operationID = regexp.MustCompile(`^[0-9a-f]{32}$`)
 var scopeID = regexp.MustCompile(`^[a-zA-Z0-9_-]{1,80}$`)
@@ -121,6 +122,7 @@ func Array(m map[string]any, k string) []any { v, _ := m[k].([]any); return v }
 func Verify(envelope map[string]any, domain string, pub ed25519.PublicKey) (map[string]any, []byte, error) {
 	if !Closed(envelope, "payload", "signature") || len(pub) != ed25519.PublicKeySize { return nil, nil, refuse("RECOVERY_ENVELOPE") }
 	raw, err := base64.StdEncoding.Strict().DecodeString(Text(envelope, "payload")); if err != nil || len(raw) > MaxBytes || base64.StdEncoding.EncodeToString(raw) != Text(envelope, "payload") { return nil, nil, refuse("RECOVERY_ENVELOPE") }
+	if !signatureHex.MatchString(Text(envelope, "signature")) { return nil, nil, refuse("RECOVERY_SIGNATURE") }
 	sig, err := hex.DecodeString(Text(envelope, "signature")); if err != nil || len(sig) != ed25519.SignatureSize || !ed25519.Verify(pub, append([]byte(domain), raw...), sig) { return nil, nil, refuse("RECOVERY_SIGNATURE") }
 	m, err := Parse(raw); return m, raw, err
 }
