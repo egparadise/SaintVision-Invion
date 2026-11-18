@@ -31,7 +31,13 @@ source_of_truth: "Git"
   - 계정 이름 `inviz`가 PC1과 PC4에서 같아도 신원이 아니다.
   - 복구 판정은 11개 행동으로 정한다. 종단 CA로의 rollback은 표현할 수 없다.
   - 사전 갱신은 successor CA lead ≥ leaf 수명 + B_CA + overlap + 660초다. 7일 CA는 거부된다.
-- **확인**: 로컬 게이트의 명령·exit code·KST는 `Evidence/fleet5-authority-replacement-r1-20261118-claude/local-gates.json`에, hosted CI는 같은 폴더의 `hosted-ci.json`에 있다. 상세는 [[2026-11-18_FLEET5_Authority_Replacement_Contract_R1_Claude]].
+- **확인**:
+  - 로컬 게이트 12개가 모두 exit 0이다(`local-gates.json`).
+  - 후보 `12b67c01`에서 hosted CI 3개가 모두 성공했다(`hosted-ci.json`).
+    - Docs 44311583254
+    - Core 44311588702: 9032 passed
+    - Backend 44311594014: 3.12와 3.14 각각 8674 passed
+  - 증거 폴더는 `Evidence/fleet5-authority-replacement-r1-20261118-claude/`다. 상세는 [[2026-11-18_FLEET5_Authority_Replacement_Contract_R1_Claude]].
 - **하지 않은 것**:
   - live 자격증명·SSH·DB·Docker·키·인증서 접근, canonical sync apply, 운영 활성화
   - Codex custody·preflight 파일 변경

@@ -1,0 +1,113 @@
+{
+  "schema": "claude-hosted-ci:1",
+  "task": "task_bbffe750d781",
+  "candidateSHA": "12b67c0126c96f09e06a0fa8f78a5d2a73f7461d",
+  "branch": "egparadise/fleet5-authority-replacement-20261118",
+  "dispatch": "gh workflow run <wf> --ref <branch> -f correlation_id=ar-r1-12b67c01-<wf>",
+  "runs": [
+    {
+      "runID": 44311583254,
+      "workflow": "Documentation Build",
+      "displayTitle": "ar-r1-12b67c01-docs.yml",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "headSha": "12b67c0126c96f09e06a0fa8f78a5d2a73f7461d",
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-18T13:13:46Z",
+      "updatedAt": "2026-11-18T13:14:15Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44311583254",
+      "jobs": [
+        {
+          "name": "docs",
+          "jobID": 134826812175,
+          "conclusion": "success",
+          "steps": 19,
+          "stepsNotSuccess": []
+        }
+      ],
+      "pytestSummaryFromJobLog": {}
+    },
+    {
+      "runID": 44311588702,
+      "workflow": "Core Build",
+      "displayTitle": "ar-r1-12b67c01-core.yml",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "headSha": "12b67c0126c96f09e06a0fa8f78a5d2a73f7461d",
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-18T13:13:49Z",
+      "updatedAt": "2026-11-18T13:49:45Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44311588702",
+      "jobs": [
+        {
+          "name": "core",
+          "jobID": 134826831277,
+          "conclusion": "success",
+          "steps": 44,
+          "stepsNotSuccess": []
+        },
+        {
+          "name": "s01-storage-roundtrip",
+          "jobID": 134826831377,
+          "conclusion": "success",
+          "steps": 16,
+          "stepsNotSuccess": []
+        }
+      ],
+      "pytestSummaryFromJobLog": {
+        "core": "9032 passed, 46 skipped, 2 deselected in 1407.58s"
+      }
+    },
+    {
+      "runID": 44311594014,
+      "workflow": "Backend Build",
+      "displayTitle": "ar-r1-12b67c01-backend.yml",
+      "event": "workflow_dispatch",
+      "attempt": 1,
+      "headSha": "12b67c0126c96f09e06a0fa8f78a5d2a73f7461d",
+      "status": "completed",
+      "conclusion": "success",
+      "createdAt": "2026-11-18T13:13:51Z",
+      "updatedAt": "2026-11-18T13:33:59Z",
+      "url": "https://github.com/egparadise/SaintVision-Invion/actions/runs/44311594014",
+      "jobs": [
+        {
+          "name": "mlflow-live",
+          "jobID": 134826852828,
+          "conclusion": "success",
+          "steps": 9,
+          "stepsNotSuccess": []
+        },
+        {
+          "name": "backend (3.12)",
+          "jobID": 134826853333,
+          "conclusion": "success",
+          "steps": 18,
+          "stepsNotSuccess": []
+        },
+        {
+          "name": "backend (3.14)",
+          "jobID": 134826853577,
+          "conclusion": "success",
+          "steps": 18,
+          "stepsNotSuccess": []
+        }
+      ],
+      "pytestSummaryFromJobLog": {
+        "backend (3.12)": "8674 passed, 75 skipped, 2 deselected in 886.25s",
+        "backend (3.14)": "8674 passed, 75 skipped, 2 deselected in 1129.52s"
+      }
+    }
+  ],
+  "allSuccessAtExactSHA": true,
+  "gateCollection": "tests/core/test_fleet5_authority_replacement_proposal.py is under pyproject testpaths=['tests'] and absent from Backend IGNORES (tools/node_dependent_tests.py) and Core --ignore lists; -q output does not list individual passing tests, so its inclusion in the totals is inferred from configuration, not from a per-test listing.",
+  "docsWorkflow": "Docs run executes check_docs, path-citation ratchet, contract bindings, frontend integrity, test_sync, ontology gates, build_docs",
+  "notClaimed": [
+    "independent security review",
+    "live operation",
+    "canonical sync apply",
+    "production activation"
+  ]
+}

@@ -50,7 +50,27 @@ Task FLEET5-AUTHORITY-REPLACEMENT-CONTRACT-R1-20261118 (Orca task_bbffe750d781, 
 
 ## Verification
 
-Local gates on Windows, Python 3.10.11 with `PYTHONUTF8=1`, run individually through an argv driver. Their exit codes and KST times are in `Evidence/fleet5-authority-replacement-r1-20261118-claude/local-gates.json`. Hosted runs are listed in the same folder's `hosted-ci.json` once dispatched.
+Local gates ran on Windows with Python 3.10.11 and `PYTHONUTF8=1`, individually through an argv driver, 2026-11-18 22:01–22:13 KST. **All 12 exited 0**:
+- check_docs (1276 documents)
+- path-citation ratchet against d81d40f8
+- contract bindings, frontend integrity, test_sync
+- ontology generation, ontology check, single-source ratchet
+- sync_obsidian `--check` (3797 files, 3 pending exports, 0 conflicts; no apply)
+- the new checker (45 documents)
+- generator `--check`
+- pytest (155 passed)
+
+Record: `Evidence/fleet5-authority-replacement-r1-20261118-claude/local-gates.json`. The driver's own git-status decode failed on cp949 and printed `clean`, so that field was corrected by hand to "dirty candidate files".
+
+Hosted runs at exact candidate `12b67c0126c96f09e06a0fa8f78a5d2a73f7461d`, dispatched with correlation IDs `ar-r1-12b67c01-*`. **All three succeeded**, and no step concluded other than success or skipped:
+
+| Workflow | Run | Result |
+|---|---|---|
+| Docs | 44311583254 | success |
+| Core | 44311588702 | success; `core` job 9032 passed, 46 skipped, 2 deselected |
+| Backend | 44311594014 | success; 3.12 and 3.14 each 8674 passed, 75 skipped, 2 deselected |
+
+Record: `hosted-ci.json`. The new test file is under `testpaths` and in no ignore list. Its inclusion in those totals is inferred from configuration, because `-q` output lists no individual passing tests.
 
 ## Next
 
