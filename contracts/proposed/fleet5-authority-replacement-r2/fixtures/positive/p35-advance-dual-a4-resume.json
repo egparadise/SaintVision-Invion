@@ -342,7 +342,6 @@
    "members": [
     {
      "nodeID": "nod_00000000000000000000000PC2",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
@@ -360,7 +359,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC3",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 1,
      "channelCertificateSHA256": "be9fc83e5265ee671b26ef0af57ea02c1f3d775b5c78d47c3d4e2fcf832b6e15",
@@ -376,7 +374,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC4",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 3,
      "channelCertificateSHA256": "58568b2abbab546340b04ecf0828bc9b6216b00d926605d1ca430bf4ac3fa353",

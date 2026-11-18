@@ -334,7 +334,7 @@
  },
  "operationManifest": {
   "planDigest": "e94ce81d283252c7afac0581fbb4eaa4f362e0555daf2ca5c0e16c4a8e9c704d",
-  "digest": "00bf47eb86a7fcc93406e2e3487b45ae451429d36ac763dfbfea2a206388698e",
+  "digest": "43a4f9ea9da8b5fa90b43c2bf8495deb4c39117cff1f47a00271d7539d2bfb73",
   "operationCount": 26
  },
  "checkpoint": {
@@ -382,7 +382,6 @@
    "members": [
     {
      "nodeID": "nod_00000000000000000000000PC2",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 1,
      "channelCertificateSHA256": "d9b4399213ff1b48ae1c4412ad70d833c1afb1892b4c6cc716745b35417cb3e2",
@@ -398,7 +397,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC3",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 1,
      "channelCertificateSHA256": "15ba49ba5caf8c9b54c78e827acaebeb2e66854c4af32201f3b42b5ef0c320b7",
@@ -414,7 +412,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC4",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 3,
      "channelCertificateSHA256": "a725279e008afdd5f7b6b3f17862ea34fb6b945efbdcc0be39a59d82dffb170f",

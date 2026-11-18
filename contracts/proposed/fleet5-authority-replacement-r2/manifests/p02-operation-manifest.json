@@ -3,7 +3,7 @@
  "sourcePlan": "fixtures/positive/p02-a1-durable-resume-anchor-stage.json",
  "manifest": {
   "planDigest": "46f09c297913b575f94512b20f51e8935f176b92584174e92e125d84891bdedc",
-  "digest": "b9b7c2000cda75262bcdf0ccb97599a635039aaf774f1d494f0f4326a3a998f0",
+  "digest": "b1a950baeac43703564e3b4383529dfd829ab1c8ec9118224a229a56b3b8379e",
   "operations": [
    {
     "opID": "op_05021c48f1db4a99e7a35a2e",
@@ -374,10 +374,10 @@
     "expectedVersion": null,
     "endpoint": null,
     "pre": {
-     "rowPresent": false
+     "rowExists": false
     },
     "post": {
-     "rowPresent": true,
+     "rowExists": true,
      "reservationDigest": "f6250e4c03393cea251669667a884827f15796860d3c839764abd38e57a106a7"
     }
    },

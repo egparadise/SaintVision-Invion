@@ -375,7 +375,7 @@ def initial_readback(doc: dict, resume_at: str) -> dict:
     observed = _iso(at - timedelta(seconds=30))
     prior_d = checker.anchor_digest([doc["priorAuthority"]["caCertificateSHA256"]])
     pin = doc["operationManifest"]
-    rows = [{"nodeID": m["nodeID"], "rowPresent": True, "reservationDigest": None,
+    rows = [{"nodeID": m["nodeID"], "reservationDigest": None,
              "channelVersion": m["counters"]["channelVersionBefore"],
              "channelCertificateSHA256": checker.prior_leaf_sha(m), "channelAuditOpIDs": [],
              "policyFloor": m["counters"]["policyFloorBefore"], "installedPolicyDigest": m["priorPolicyDigest"],
@@ -557,7 +557,7 @@ def positives() -> dict[str, tuple[str, dict]]:
 
     def foreign_row(doc):
         doc["checkpoint"]["readback"]["members"].append({
-            "nodeID": member(doc, "PC1")["nodeID"], "rowPresent": True, "reservationDigest": h("foreign-reservation"),
+            "nodeID": member(doc, "PC1")["nodeID"], "reservationDigest": h("foreign-reservation"),
             "channelVersion": 0, "channelCertificateSHA256": None, "channelAuditOpIDs": [], "policyFloor": 0,
             "installedPolicyDigest": None, "policyJournalOpIDs": [], "installedLeafSHA256": None,
             "stagedAnchorDigest": None, "nodeObservedAt": None, "nodeReceivedAt": None, "nodeChallengeNonce": None})

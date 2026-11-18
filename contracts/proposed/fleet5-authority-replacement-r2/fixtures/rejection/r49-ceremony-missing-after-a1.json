@@ -349,7 +349,7 @@
     "holderPlanDigest": "69146fa49d66febf73b3660337ed67e850a3d66e0766911528cab6d975d23bd5",
     "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "cb9b759dbb6562407a4bbd5ab5f042f4e5f809b5c77b2672077942c88cbca079",
+   "journalManifestDigest": "02fb29d086b84bd7518f58eed5bf64968aff965425d3560ea1ccc894f93e0b9b",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -378,7 +378,6 @@
    "members": [
     {
      "nodeID": "nod_00000000000000000000000PC2",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 1,
      "channelCertificateSHA256": "d9b4399213ff1b48ae1c4412ad70d833c1afb1892b4c6cc716745b35417cb3e2",
@@ -394,7 +393,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC3",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 1,
      "channelCertificateSHA256": "15ba49ba5caf8c9b54c78e827acaebeb2e66854c4af32201f3b42b5ef0c320b7",
@@ -410,7 +408,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC4",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 3,
      "channelCertificateSHA256": "a725279e008afdd5f7b6b3f17862ea34fb6b945efbdcc0be39a59d82dffb170f",

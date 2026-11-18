@@ -427,16 +427,16 @@
       "type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
     },
     "readbackRow": {
+      "description": "A Node row the DB returned, with that Node's challenged observation. Absence is omission: there is no placeholder for a missing row.",
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "nodeID", "rowPresent", "reservationDigest", "channelVersion", "channelCertificateSHA256", "channelAuditOpIDs",
+        "nodeID", "reservationDigest", "channelVersion", "channelCertificateSHA256", "channelAuditOpIDs",
         "policyFloor", "installedPolicyDigest", "policyJournalOpIDs", "installedLeafSHA256", "stagedAnchorDigest",
         "nodeObservedAt", "nodeReceivedAt", "nodeChallengeNonce"
       ],
       "properties": {
         "nodeID": {"$ref": "#/$defs/nodeID"},
-        "rowPresent": {"type": "boolean"},
         "reservationDigest": {"$ref": "#/$defs/nullableSha256"},
         "channelVersion": {"$ref": "#/$defs/counter"},
         "channelCertificateSHA256": {"$ref": "#/$defs/nullableSha256"},

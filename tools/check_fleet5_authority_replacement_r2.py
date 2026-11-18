@@ -435,8 +435,8 @@ def expected_manifest(doc: dict) -> dict | None:
             continue
         rd = reservation_digest(m)
         op("E1_ENROLLMENT_RESERVED", "RESERVE", m["nodeID"], {"reservationDigest": None}, {"reservationDigest": rd})
-        op("E2_ENROLLMENT_ROW_ADMITTED", "ROW_ADMIT", m["nodeID"], {"rowPresent": False},
-           {"rowPresent": True, "reservationDigest": rd})
+        op("E2_ENROLLMENT_ROW_ADMITTED", "ROW_ADMIT", m["nodeID"], {"rowExists": False},
+           {"rowExists": True, "reservationDigest": rd})
         op("E3_ENROLLMENT_CHANNEL_PROVISIONED", "CHANNEL_PROVISION", m["nodeID"],
            {"channelVersion": 0, "channelCertificateSHA256": None},
            {"channelVersion": 1, "channelCertificateSHA256": m["plannedLeafSHA256"]}, expected=0,
@@ -912,7 +912,7 @@ def op_state(doc: dict, op: dict, ctx: _Context | None = None) -> str:
     ctx = ctx or _Context(doc)
     kind, target, pre, post = op["kind"], op["target"], op["pre"], op["post"]
     row = ctx.rows.get(target)
-    present = row is not None and row["rowPresent"]
+    present = row is not None  # one representation: a readback row exists iff the DB returned it
     node_fresh = present and ctx.fresh(row["nodeObservedAt"], row["nodeReceivedAt"], row["nodeChallengeNonce"])
     enrolling = ctx.kinds.get(target) == "NEW_ENROLLMENT"
     if kind in ("ANCHOR_STAGE", "ANCHOR_RETIRE", "LEAF_INSTALL"):
@@ -1152,19 +1152,19 @@ def recovery_action(doc: dict) -> tuple[str, str | None, list[str], list[str]]:
     planned_ids = {m["nodeID"] for m in doc["members"]}
     known = {r["nodeID"] for r in doc["existingNodeRows"]["rows"]}
     for node_id, row in ctx.rows.items():
-        if row["rowPresent"] and node_id not in planned_ids and node_id not in known:
+        if node_id not in planned_ids and node_id not in known:
             return "HOLD_UNPLANNED_ROW", None, *none
     for m in doc["members"]:
         if m["kind"] != "NEW_ENROLLMENT":
             continue
         row = ctx.rows.get(m["nodeID"])
         found = [r for r in rb["reservations"] if r["nodeID"] == m["nodeID"]]
-        if li < A7 and ((row is not None and row["rowPresent"]) or found):
+        if li < A7 and (row is not None or found):
             return "HOLD_ENROLLMENT_BEFORE_ROTATION_SETTLED", None, *none
         rd = reservation_digest(m)
         if any(r["reservationDigest"] != rd or r["fenceToken"] != doc["writerFence"]["token"] for r in found):
             return "HOLD_RESERVATION_MISMATCH", None, *none
-        if row is not None and row["rowPresent"] and row["reservationDigest"] != rd:
+        if row is not None and row["reservationDigest"] != rd:
             return "HOLD_RESERVATION_MISMATCH", None, *none
     final = final_phase(doc)
     resume = flight if flight is not None else (None if last == final else PHASES[li + 1])
@@ -1221,9 +1221,11 @@ def apply_op(doc: dict, op: dict) -> bool:
         rb["reservations"].append({"nodeID": target, "reservationDigest": post["reservationDigest"],
                                    "fenceToken": doc["writerFence"]["token"]})
     elif kind == "ROW_ADMIT":
+        if row is not None:  # never a second row for one NodeID: admission updates nothing in place
+            raise ExecutorConflict(op["opID"])
         member = next(m for m in doc["members"] if m["nodeID"] == target)
         rb["members"].append({
-            "nodeID": target, "rowPresent": True, "reservationDigest": post["reservationDigest"],
+            "nodeID": target, "reservationDigest": post["reservationDigest"],
             "channelVersion": 0, "channelCertificateSHA256": None, "channelAuditOpIDs": [],
             "policyFloor": 0, "installedPolicyDigest": None, "policyJournalOpIDs": [],
             "installedLeafSHA256": member["plannedLeafSHA256"],

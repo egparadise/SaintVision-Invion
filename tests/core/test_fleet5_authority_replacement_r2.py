@@ -157,7 +157,7 @@ def test_f1_row_without_channel_during_e2_is_a_journaled_resume_not_a_foreign_wr
     """R1 returned HOLD_FOREIGN_WRITER for a present row without C=1 even during E2."""
     doc = state(A["E1"], A["E2"], landed=lambda op: True)
     row = gen.row(doc, "PC1")
-    assert row["rowPresent"] and row["channelVersion"] == 0
+    assert row["channelVersion"] == 0
     rd = checker.reservation_digest(gen.member(doc, "PC1"))
     admit = gen.op_of(doc, A["E2"], "PC1")["opID"]
     assert checker.recovery_action(doc) == ("RESUME_FORWARD", A["E2"], [], [admit])
@@ -213,6 +213,43 @@ def test_f1_shared_account_or_inventory_ip_is_no_ownership_evidence():
     # Ownership comes only from the Node-signed CSR: PC1 cannot present PC4's key.
     pc1["csrDER"] = gen.make_csr("PC4-node", pc1["nodeID"])
     assert {"AR-CSR-POP"} <= set(checker.evaluate(gen.seal(doc), SCHEMA))
+
+
+# ---------------------------------------------------------------- review R2 finding 4: E2 row representation
+
+
+def test_r2f4_a_placeholder_row_for_an_absent_node_is_not_representable():
+    """R2 counted a rowPresent=false placeholder as pending, then ROW_ADMIT appended a second row."""
+    doc = state(A["E1"], A["E2"])
+    placeholder = copy.deepcopy(gen.row(state(A["E1"], A["E2"], landed=lambda op: True), "PC1"))
+    placeholder["rowPresent"] = False
+    doc["checkpoint"]["readback"]["members"].append(placeholder)
+    assert checker.evaluate(doc, SCHEMA) == ["AR-SCHEMA"]
+
+
+def test_r2f4_row_admission_never_creates_a_second_row():
+    doc = state(A["E1"], A["E2"], landed=lambda op: True)
+    before = copy.deepcopy(doc["checkpoint"]["readback"])
+    admit = gen.op_of(doc, A["E2"], "PC1")
+    with pytest.raises(checker.ExecutorConflict):
+        checker.apply_op(doc, admit)
+    assert doc["checkpoint"]["readback"] == before
+
+
+def test_r2f4_interrupted_e2_resumes_to_exactly_one_row():
+    doc = state(A["E1"], A["E2"])
+    admit = gen.op_of(doc, A["E2"], "PC1")["opID"]
+    assert checker.recovery_action(doc) == ("RESUME_FORWARD", A["E2"], [admit], [])
+    crashed, mutations = checker.execute_resume(doc)
+    assert mutations == [admit]
+    crashed = checker.observe(crashed, "fixture-challenge-0002")
+    assert checker.recovery_action(crashed) == ("RESUME_FORWARD", A["E2"], [], [admit])
+    replay, second = checker.execute_resume(crashed)
+    assert second == []
+    pc1 = [r for r in replay["checkpoint"]["readback"]["members"] if r["nodeID"] == gen.NODE["PC1"]]
+    assert len(pc1) == 1
+    nxt = checker.observe(checker.journal_durable(replay), "fixture-challenge-0003")
+    assert checker.recovery_action(nxt)[:2] == ("RESUME_FORWARD", A["E3"])
 
 
 # ---------------------------------------------------------------- F2 identity and authority

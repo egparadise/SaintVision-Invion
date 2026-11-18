@@ -334,7 +334,7 @@
  },
  "operationManifest": {
   "planDigest": "08aebf1db07ca46ad440a1fb6e98b5e5af99c6648312167359fcc8f1b65d9f45",
-  "digest": "639fa62cf5a116069d66536ecb6e35170862e6687afc7201b83b69f4c0934e11",
+  "digest": "ad3ab5e40af6730487383c96258222f870aadf3aff48e724f965a41bd5b02144",
   "operationCount": 26
  },
  "checkpoint": {
@@ -353,7 +353,7 @@
     "holderPlanDigest": "08aebf1db07ca46ad440a1fb6e98b5e5af99c6648312167359fcc8f1b65d9f45",
     "readAt": "2026-11-18T13:59:30Z"
    },
-   "journalManifestDigest": "639fa62cf5a116069d66536ecb6e35170862e6687afc7201b83b69f4c0934e11",
+   "journalManifestDigest": "ad3ab5e40af6730487383c96258222f870aadf3aff48e724f965a41bd5b02144",
    "ceremonyLog": {
     "caKeysCreated": 1,
     "signed": [
@@ -382,7 +382,6 @@
    "members": [
     {
      "nodeID": "nod_00000000000000000000000PC2",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 2,
      "channelCertificateSHA256": "b2ed795a6a875d095c59ebfff631c3511d10e189448c2fcb3eee0d510e9d5cc0",
@@ -402,7 +401,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC3",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 2,
      "channelCertificateSHA256": "1d4f0a321a46a39bdda5c5b6e35591542783ed425b646821cb8163512561cf93",
@@ -422,7 +420,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC4",
-     "rowPresent": true,
      "reservationDigest": null,
      "channelVersion": 4,
      "channelCertificateSHA256": "6dc786f0238020f69e7328b35e27b2bf79645a4125162f77ab46f9c39669a98e",
@@ -442,7 +439,6 @@
     },
     {
      "nodeID": "nod_00000000000000000000000PC1",
-     "rowPresent": true,
      "reservationDigest": "7ec91236a355495ca2d4d59ea016f01df57298bde75cdb2117ecfccd6097f772",
      "channelVersion": 0,
      "channelCertificateSHA256": null,
