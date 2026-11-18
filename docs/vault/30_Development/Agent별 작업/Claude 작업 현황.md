@@ -1,10 +1,10 @@
 ---
 doc_id: "WORKBOARD-CLAUDE-001"
 title: "Claude 작업 현황"
-version: "1.2.134"
+version: "1.2.135"
 status: "review"
 author: "Claude"
-updated: "2026-11-18T22:10:00+09:00"
+updated: "2026-11-18T23:20:00+09:00"
 
 
 
@@ -12,6 +12,28 @@ updated: "2026-11-18T22:10:00+09:00"
 
 source_of_truth: "Git"
 ---
+
+## 2026-11-18 만료 정책 후보 15384c36 독립 검토 R2 (Claude 직접 기록)
+
+- **작업** (task_5898fc185b22 / ctx_6943350be96a, 22:40 KST 착수): Codex 후보 `15384c36`을 base `d47630d7`와 비교해 검토했다. 범위는 커밋 7개, 비증거 파일 19개다. 브랜치는 `egparadise/fleet5-d476-15384c36-review-20261118`다.
+- **결론**: **ACCEPT_SOURCE_CANDIDATE_ONLY_KEEP_INTEGRATION_AND_OPERATING_GATES**, 필수 차단 0건. 통합·운영 gate와 P1~P7 NOT_RUN은 그대로다. PC1 고유 등록은 이 후보 범위 밖이며 남아 있다.
+- **이전 지적 F1~F6 상태**:
+  - F1~F4: 닫힘. 소문자 서명 hex, v2 역할 키 hash 결합과 image anchor, openat2 격리와 O_TMPFILE 게시, 2^53 범위 검사.
+  - F5: fixture에서 닫힘.
+  - F6: 부분 해결. 만료 PREPARED는 typed HOLD로 바뀌었지만, 서명된 종단 전이는 아직 없다.
+- **새 지적**:
+  - LOW 2건: R2-01은 binding 음성 대조가 코드 하나로 합쳐져 어느 조건이 거부했는지 보이지 않는다는 점이다. R2-02는 운영 binding 출처인 `provisioned_reader()`에 시험이 없다는 점이다.
+  - INFO 5건(R2-03~07): anchor의 보증 경계, launch-signer 역할 분리, forward reconciliation 미정의, `/proc`·`linkat` 잔여 위험, 3인 cohort 고정과 PC1 분리.
+- **확인**:
+  - hosted 4개 실행(Core/Backend/Docs/ac11)이 정확한 SHA에서 모두 성공했다.
+  - Go 후보 시험 7개 PASS, FAIL 0줄이다.
+  - artifact 3개를 내려받아 대조했다. 음성 대조 61개 중 exit 0은 없다. PG 증거(숨은 행 0 → `OPERATOR_VISIBILITY_UNKNOWN`, 튜플 변경 0)가 ROOT-READY와 일치한다.
+  - 로컬 Python 3.14에서 49 passed, 5 failed다. 실패 5건은 Windows에 POSIX API가 없어서이고, hosted Linux에서는 통과한다.
+  - 기록은 `Evidence/fleet5-d476-15384c36-review-20261118-claude/review.json`이고, 상세는 [[2026-11-18_FLEET5_D476_15384c36_Independent_Review_R2_Claude]]다.
+- **하지 않은 것**: live 접근, canonical apply, 활성화, Codex 파일 변경.
+- **다음 첫 행동/담당**:
+  1. Codex가 통합 전에 R2-02, 이어서 R2-01을 보완한다.
+  2. Root는 source 후보만 통합한다.
 
 ## 2026-11-18 FLEET5 authority 교체·사전 갱신 계약 R1 제안 (Claude 직접 기록)
 

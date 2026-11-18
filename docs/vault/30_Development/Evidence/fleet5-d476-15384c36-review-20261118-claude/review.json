@@ -1,0 +1,114 @@
+{
+  "schema": "claude-independent-review:1",
+  "task": "task_5898fc185b22",
+  "dispatch": "ctx_6943350be96a",
+  "reviewer": "Claude",
+  "author": "Codex",
+  "candidate": "15384c36f184ec7e2008329bc5c221aa1595d5f7",
+  "base": "d47630d730278aa9e49b15a63cd221696da8dc00",
+  "priorReview": "2026-11-08_FLEET5_Expired_Policy_D476_Source_Security_Review_R1_Claude (F1-F6)",
+  "reviewedAtKST": "2026-11-18T23:06:17+09:00",
+  "method": [
+    "Static read of the immutable Git diff d47630d7..15384c36 (19 non-evidence files, +1950/-93) and full sources at 15384c36: custody_linux.go, authority_linux.go, wire.go, proposed_expired_policy_recovery.py, tools/recovery_preflight/{common,cp,join,node}.py, the new and changed tests, tests/proofs/run_expired_policy_candidate.py, .github/workflows/backend.yml",
+    "Local run of 2 Python test files from a git-archive copy of 15384c36 with Python 3.14.0 on Windows (scratch venv, no repository conftest)",
+    "Read-only GitHub API: exact-SHA run conclusions, hosted Go test lines from the Core log, and download of 3 proof artifacts"
+  ],
+  "readPins": {
+    "rootReadyWorkingCopySHA256": {
+      "path": "fleet5-recovery-resume-20261118/docs/vault/30_Development/Evidence/fleet5-recovery-integration-resume-20261118/ROOT-READY-15384c36f184.json",
+      "sha256": "abaf481f02650b29fe7d6f6528fda0633abd8cd06b2feaa1ad3c2aaa8d3570f6",
+      "note": "untracked working-copy bytes in the Codex worktree; not a Git object"
+    },
+    "boardHistoryAddendumWorkingCopySHA256": "1a6cb54cd59ff2d04cdcf94a2e8dd9074b68885e8c6f461d463d79945f5a5ed5",
+    "hostedRuns": {
+      "Core Build 44309388161": "success at 15384c36",
+      "Backend Build 44309650079": "success at 15384c36",
+      "Documentation Build 44309649837": "success at 15384c36",
+      "ac11-security-scan 44309650022": "success at 15384c36"
+    },
+    "artifacts": {
+      "14429357295 fleet5-expired-policy-candidate-15384c36 result.json": {
+        "sha256": "1bdf934ad555c9a02207a1a4ad415cb65d3329da69dff1b8f66fafbc7a2a850b",
+        "status": "CANDIDATE_COMPONENT_PROOF_PASSED_KEEP_INTEGRATION_HOLD",
+        "negativeControls": 61,
+        "negativeControlsWithExitZero": 0,
+        "launchSignerSHA256": "e47d419000fe32f646146f810c6e496082bad9a4941ccb4ff91033930403416e",
+        "authorityBindingSHA256": "063a5c7d4e818833d9a76974868e73422d8e162a71762615ae0ee78acaf9117b",
+        "readOnlyNodeObservations": "3 complete, recoveryReady false, changedFiles 0/0/0",
+        "productionIntegration": "NOT_RUN"
+      },
+      "14430495520 fleet5-readonly-pg-3.12 observations.json": {
+        "sha256": "185059bb7bcd72d6745ebbd717cd0c16e059a7f6a9810959155082c39f866232",
+        "hiddenChannelCount": 0,
+        "hiddenDisposition": "OPERATOR_VISIBILITY_UNKNOWN",
+        "bindingNegatives": "4/4 OPERATOR_VISIBILITY_UNKNOWN",
+        "openRuns": 1,
+        "tupleChanges": "0/0/0",
+        "assignedTransactionID": null,
+        "channelRowsBeforeEqualsAfter": true
+      },
+      "14429517726 fleet5-readonly-pg-3.14 observations.json": {
+        "sha256": "a121927a6fca53c8b45755079707c2a272f8ba92bf6ef971cfbbb50ca91dd500"
+      }
+    },
+    "hostedGoCandidateTests": "PASS: TestFilesystemNumberBound, TestPinnedParentSurvivesRename, TestHistoryRefusesSignedForeignScopeWithSameRetainedKey, TestHistoricalV1NamespaceRemainsOnHold, TestStrictWireRefusesAmbiguity, TestDistinctSignatureDomainsAndActors, TestJournalExactBytesNotRewritten; 0 '--- FAIL' lines in the Core log"
+  },
+  "localRun": {
+    "interpreter": "Python 3.14.0 scratch venv (pytest, cryptography, jsonschema), Windows 11",
+    "command": "python -m pytest -q -p no:cacheprovider tests/core/test_readonly_cohort_join.py tests/core/test_proposed_expired_policy_recovery.py",
+    "result": "49 passed, 5 failed",
+    "failedCause": "platform only: the reference ledger uses os.O_NOFOLLOW and os.geteuid, which Windows lacks. The same tests pass on hosted Linux (Core/Backend at 15384c36). Not a candidate defect.",
+    "notRunLocally": "Go linux-tagged tests and the PostgreSQL/Docker proofs; evidence for those is hosted only"
+  },
+  "priorFindings": [
+    {"id": "F1", "prior": "LOW", "status": "CLOSED", "evidence": "wire.go:35 and wire.go:125 apply a ^[0-9a-f]{128}$ check before hex decode; Python proposed_expired_policy_recovery.py:131 does the same; hosted controls signature-encoding-{uppercase,odd,whitespace} x3 refuse with RECOVERY_SIGNATURE"},
+    {"id": "F2", "prior": "LOW", "status": "CLOSED", "evidence": "the v2 proof and checkpoint bodies bind authorizerSHA256/operatorSHA256 (custody_linux.go:276, :310); ownHistory checks them (custody_linux.go:122); Python expects them (proposed_expired_policy_recovery.py:253, :275, :385); the v2 domains (wire.go:25, :27) keep v1 history on HOLD; the empty-history first slot is anchored by an image-baked recovery-authority.json (authority_linux.go:50-75); hosted controls foreign-first-slot-authority, absent-image-authority and overmounted-authority x3"},
+    {"id": "F3", "prior": "LOW", "status": "CLOSED", "evidence": "openat2 with RESOLVE_NO_XDEV|RESOLVE_NO_SYMLINKS|RESOLVE_BENEATH (authority_linux.go:20-31), failing closed on non-amd64/arm64 or kernels without openat2; held directory FDs walked per component with O_NOFOLLOW (custody_linux.go:52); child mount-ID equality (custody_linux.go:42); rejection of four-root dev/ino aliases (custody_linux.go:181); the root directories re-validated before the proof and the checkpoint; publication by O_TMPFILE+linkat with no named temporary (custody_linux.go:132-163); TestPinnedParentSurvivesRename; hosted controls identical-inode-file-mount-alias and host-bind-parent-replaced"},
+    {"id": "F4", "prior": "LOW", "status": "CLOSED", "evidence": "supportedFilesystemNumber <= 2^53-1 on lock dev/ino before the int64 cast (custody_linux.go:29, :198); Python wire refusal test_filesystem_numbers_keep_wire_range; node.py records dev/ino as strings and adds RECOVERY_HOLD_FILESYSTEM_NUMBER_RANGE (node.py:164)"},
+    {"id": "F5", "prior": "INFO", "status": "CLOSED_FOR_FIXTURE", "evidence": "the fixture now uses a distinct launch_signer key and asserts it differs from all other role keys; launchSignerSHA256 e47d4190 is in the artifact. Helper-side residual: R2-04"},
+    {"id": "F6", "prior": "INFO", "status": "PARTIAL", "evidence": "an expired PREPARED operation now refuses with typed EXPIRED_PREPARED_REQUIRES_FORWARD_RECONCILIATION in prepare/commit/reconcile (proposed_expired_policy_recovery.py:361, :397, :423); the ledger refuses a schema without the deadline column. No signed, audited terminal transition exists yet: R2-05"}
+  ],
+  "newFindings": [
+    {"id": "R2-01", "severity": "LOW", "category": "test-evidence",
+     "where": "tools/recovery_preflight/cp.py:36-52, :69-72; tests/integration/test_recovery_cohort_preflight.py binding negatives",
+     "summary": "The wrong tenant and all four binding negatives collapse into one OPERATOR_VISIBILITY_UNKNOWN code, because observe() wraps verify_reader in a broad except. The hosted proof shows that each negative is refused, but not which predicate refused it.",
+     "failureScenario": "A regression that drops, for example, the grant query's person_id predicate would still pass wrong-person if an earlier predicate also failed for that input. Today wrong-project is rejected only by the pure-Python binding/descriptor equality, before any database query.",
+     "recommendation": "Keep the external code. Add a test-only sub-reason, or unit-test each verify_reader predicate in isolation with every other field valid."},
+    {"id": "R2-02", "severity": "LOW", "category": "test-coverage",
+     "where": "tools/recovery_preflight/cp.py:16-33, :70",
+     "summary": "provisioned_reader(), the only binding source main() uses in production, has no test. Every test injects the binding directly, and nothing under tests/, tools/ or .github/ references recovery-reader.json.",
+     "failureScenario": "A defect in the root-owned /etc/saintvision/recovery-reader.json open chain (owner, mode, nlink, size, short read) would not appear until the live operator run. It would fail closed, so the effect is an unplanned HOLD, not an unsafe acceptance.",
+     "recommendation": "Before integration, add a Linux test that serves the descriptor from a fixture root (or injects the root fd), with positive and negative cases for owner, mode, symlink and hardlink."},
+    {"id": "R2-03", "severity": "INFO", "category": "assurance-boundary",
+     "where": "services/node-agent/recoverycandidate/authority_linux.go:50-75; custody_linux.go:167",
+     "summary": "The first-slot authority anchor proves only that the file is in the read-only container root image. The helper does not check the image ID against anything, and the proof does not carry authorityBindingSHA256, so the CP verifier cannot see which anchor was checked. The assurance is image custody plus the helper hash, as the source comment states."},
+    {"id": "R2-04", "severity": "INFO", "category": "role-separation",
+     "where": "services/node-agent/recoverycandidate/custody_linux.go:206, :216",
+     "summary": "The helper checks only that launch-signer.pub is 32 bytes. Unlike authorizer, operator and node keys, it is not required to differ from them. Separation is enforced only by the hosted fixture."},
+    {"id": "R2-05", "severity": "INFO", "category": "liveness (F6 residual)",
+     "where": "proposed_expired_policy_recovery.py:361, :397, :423; tools/recovery_preflight/cp.py:105; join.py:28-31",
+     "summary": "An expired PREPARED operation wedges the reference ledger until a forward-reconciliation procedure that the source does not define. cp.py always reports operationOutcome UNKNOWN, so join's PREPARED and expired branch is reachable only from injected test data. This is fail-closed, not unsafe."},
+    {"id": "R2-06", "severity": "INFO", "category": "residual",
+     "where": "services/node-agent/recoverycandidate/custody_linux.go:132-163",
+     "summary": "The check of the /proc/<pid>/fd magic link and the linkat are two steps, not one atomic operation. The procfs magic check and the openat2 no-xdev open bound the risk to an operator who can mount a foreign procfs instance, which is trusted custody in this model."},
+    {"id": "R2-07", "severity": "INFO", "category": "integration-boundary",
+     "where": "tools/recovery_preflight/common.py:55; join.py:12",
+     "summary": "The preflight hard-codes the 3-member rotation cohort (PC2/PC3/PC4). PC1's unique enrollment is NEW_ENROLLMENT and must not be appended to this cohort. That matches the separation in the FLEET5 authority replacement contract R1 (C2). The collectors hash CA and leaf DER only; they do not validate the issuer chain or the SPIFFE epoch."}
+  ],
+  "checkedNoFinding": [
+    "Identity bindings: tenant/epoch/node and authorizer/operator hashes in the v2 proof and checkpoint, closed identity.json, policy scope, a single CP fingerprint, and fixture UUID/nod_ formats that mirror the fleet",
+    "Counter durability: O_TMPFILE write+fsync, an exclusive linkat, then directory fsync; the record is emitted only after the durable write; the SQLite ledger uses synchronous=FULL with a CAS on prior C/P; the history counter i+1 and the previousCheckpoint chain",
+    "Directory containment: no '..' (Clean+IsAbs), per-component O_NOFOLLOW, held FDs, openat2 for children, mount-ID equality, alias rejection, and root re-validation at proof and at checkpoint; node.py bind_identity checks mountinfo against the live bind source",
+    "False zero/RLS: zero rows under a foreign tenant is refused (OPERATOR_VISIBILITY_UNKNOWN), not reported; RLS is verified per table (enabled, forced, not owner, exactly one PUBLIC permissive tenant_isolation policy with exact qual text deparsed under search_path pg_catalog); superuser and BYPASSRLS refused; session_user==current_user; runs.state and execution_deliveries.phase are NOT NULL (migrations 0001, 0007), so the NOT IN and <> filters cannot drop NULL rows",
+    "Read-only proof: REPEATABLE READ READ ONLY, no assigned XID, zero tuple changes in pg_stat_xact_user_tables, row checksum equal before and after including xmin",
+    "Secret hygiene: node-key.pem is opened O_PATH only and never hashed (asserted in the proof); the DB connection string arrives on stdin, not argv; errors map to typed codes",
+    "Workflow: backend.yml only adds a PG preflight step plus a fail-closed artifact (test -s, if-no-files-found: error); the existing Tests step is unchanged"
+  ],
+  "verdict": {
+    "sourceOnly": "ACCEPT_SOURCE_CANDIDATE_ONLY_KEEP_INTEGRATION_AND_OPERATING_GATES",
+    "mandatoryBlockers": 0,
+    "recommendedBeforeIntegration": ["R2-02", "R2-01"],
+    "notReleased": "No integration, adapter, DB recovery, publication, migration, release or operation is released. P1-P7 production integration stays NOT_RUN. PC1 unique enrollment remains outstanding and is outside this candidate."
+  },
+  "notDone": "No live credential, SSH, DB, Docker, key or certificate access; no canonical sync apply; no activation; no change to Codex files"
+}

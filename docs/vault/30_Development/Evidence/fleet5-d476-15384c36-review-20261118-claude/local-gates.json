@@ -1,0 +1,59 @@
+{
+  "schema": "claude-local-gates:1",
+  "task": "task_5898fc185b22",
+  "environment": {
+    "os": "Windows 11",
+    "python": "3.10.11",
+    "PYTHONUTF8": "1"
+  },
+  "headAtRun": "bb6e028d179495f547921cc2afa57681a68db95b",
+  "workingTreeAtRun": "dirty (uncommitted candidate files)",
+  "gates": [
+    {
+      "command": "python tools/check_docs.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T23:10:50+09:00",
+      "endedKST": "2026-11-18T23:10:52+09:00",
+      "outputTail": [
+        "PASS: 24 original hashes, 1277 versioned documents, wiki links, 48 tasks, 12 outcomes, owner/reviewer/skills, dependency DAG."
+      ]
+    },
+    {
+      "command": "python tools/check_doc_path_citations.py --ratchet --base-ref d81d40f824538a4ef553cc8ae4aa75f7c012e325",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T23:10:52+09:00",
+      "endedKST": "2026-11-18T23:11:00+09:00",
+      "outputTail": [
+        "PASS check_doc_path_citations --ratchet: 290 broken citation(s), all in baseline, none stale, floor unchanged."
+      ]
+    },
+    {
+      "command": "python tools/check_doc_single_source.py --ratchet",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T23:11:00+09:00",
+      "endedKST": "2026-11-18T23:11:00+09:00",
+      "outputTail": [
+        "PASS check_doc_single_source --ratchet: 16 pairs, all in baseline, none stale."
+      ]
+    },
+    {
+      "command": "python tools/sync_obsidian.py --check",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T23:11:00+09:00",
+      "endedKST": "2026-11-18T23:11:10+09:00",
+      "outputTail": [
+        "CHECK: 3802 managed files, 8 pending exports, 0 conflicts. No writes."
+      ]
+    },
+    {
+      "command": "python tools/check_ontology.py",
+      "exitCode": 0,
+      "startedKST": "2026-11-18T23:11:10+09:00",
+      "endedKST": "2026-11-18T23:11:12+09:00",
+      "outputTail": [
+        "PASS: RDF parsing, defined terms, TTL/JSON-LD equivalence, 48 task mappings, positive SHACL, 4 rejected invalid fixtures, 4 competency queries, Obsidian mirrors."
+      ]
+    }
+  ],
+  "allZero": true
+}
