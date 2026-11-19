@@ -69,12 +69,22 @@ def test_pc1_transactions(e1_database):
             conn.execute("INSERT INTO inv.nodes(tenant_id,node_id,status) VALUES (%s,%s,'offline')",
                          (tenant, inputs["rows"][0]["nodeID"]))
             conn.execute("CREATE SCHEMA e1")
-            conn.execute((CONTRACT / "reservations.sql").read_text())
+            # Model a pre-existing holder at schema creation time. The complete
+            # contract has no bootstrap path until authenticated A1 exists.
+            ddl = (CONTRACT / "reservations.sql").read_text()
+            guard = ddl.index("CREATE TRIGGER guard_transfer")
+            conn.execute(ddl[:guard])
+            conn.execute("INSERT INTO fleet_writer.principals VALUES (session_user,%s)", (tenant,))
+            conn.execute("INSERT INTO fleet_writer.authority VALUES (%s,session_user,'first',1)", (tenant,))
+            conn.execute(ddl[guard:])
             conn.execute("""CREATE TABLE e1.test_authority (
                 tenant_id uuid PRIMARY KEY, holder text, generation bigint, binding jsonb, evidence jsonb,
                 read_at timestamptz DEFAULT now(), expires_at timestamptz DEFAULT now()+interval '2 minutes')""")
-            conn.execute("INSERT INTO fleet_writer.principals VALUES (session_user,%s)", (tenant,))
-            conn.execute("INSERT INTO fleet_writer.authority VALUES (%s,session_user,'first',1)", (tenant,))
+            for generation in (1, 7):
+                with pytest.raises(psycopg.errors.RaiseException, match="authenticated genesis unavailable"), conn.transaction():
+                    conn.execute("INSERT INTO fleet_writer.authority VALUES (%s,session_user,'other',%s)",
+                                 (uuid4(), generation))
+            assert conn.execute("SELECT count(*) FROM fleet_writer.authority").fetchone() == (1,)
         def membership():
             return [conn.execute("SELECT * FROM inv." + table).fetchall()
                     for table in ("nodes", "node_channels", "node_channel_audit", "resources")]
@@ -157,7 +167,47 @@ def test_pc1_transactions(e1_database):
         with conn.transaction(force_rollback=True):
             transfer("first", 1, "second", operation)
         assert conn.execute("SELECT count(*) FROM fleet_writer.transfer_journal").fetchone() == (0,)
-        transfer("first", 1, "second", operation)
+        with conn.transaction(force_rollback=True):
+            outsider = "e1_other_" + uuid4().hex
+            role = psycopg.sql.Identifier(outsider)
+            conn.execute(psycopg.sql.SQL("CREATE ROLE {}").format(role))
+            conn.execute(psycopg.sql.SQL("GRANT USAGE ON SCHEMA fleet_writer TO {}").format(role))
+            conn.execute(psycopg.sql.SQL("GRANT EXECUTE ON FUNCTION fleet_writer.transfer(uuid,text,bigint,name,text,uuid,text,text) TO {}").format(role))
+            foreign = str(uuid4())
+            conn.execute("INSERT INTO fleet_writer.principals VALUES (%s,%s)", (outsider, foreign))
+            with pytest.raises(psycopg.errors.ForeignKeyViolation), conn.transaction():
+                conn.execute("SELECT fleet_writer.transfer(%s,'first',1,%s,'second',%s,%s,%s)",
+                             (tenant, outsider, operation, binding["planDigest"], binding["fenceToken"]))
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (foreign,))
+            with pytest.raises(psycopg.errors.RaiseException, match="unauthorized transfer"), conn.transaction():
+                transfer("first", 1, "second", operation)
+            conn.execute("SELECT set_config('inv.tenant_id',%s,true)", (tenant,))
+            for principal_scope in (foreign, tenant):
+                conn.execute("UPDATE fleet_writer.principals SET tenant_id=%s WHERE login=%s",
+                             (principal_scope, outsider))
+                with conn.transaction(force_rollback=True):
+                    conn.execute(psycopg.sql.SQL("SET LOCAL SESSION AUTHORIZATION {}").format(role))
+                    with pytest.raises(psycopg.errors.RaiseException, match="stale or unauthorized"), conn.transaction():
+                        transfer("first", 1, "second", operation)
+            assert conn.execute("SELECT count(*) FROM fleet_writer.transfer_journal").fetchone() == (0,)
+
+        start = Barrier(2)
+        def compete():
+            with psycopg.connect(dsn, autocommit=True) as contender:
+                contender.execute("SELECT set_config('inv.tenant_id',%s,false)", (tenant,))
+                start.wait(timeout=10)
+                try:
+                    contender.execute("SELECT fleet_writer.transfer(%s,'first',1,session_user,'second',%s,%s,%s)",
+                                      (tenant, operation, binding["planDigest"], binding["fenceToken"]))
+                except psycopg.errors.RaiseException as exc:
+                    assert "stale or unauthorized transfer" in str(exc)
+                    return False
+                return True
+
+        with ThreadPoolExecutor(2) as workers:
+            results = [workers.submit(compete) for _ in range(2)]
+            assert sorted(result.result(timeout=15) for result in results) == [False, True]
+        assert conn.execute("SELECT count(*) FROM fleet_writer.transfer_journal").fetchone() == (1,)
         with pytest.raises(psycopg.errors.UniqueViolation), conn.transaction():
             transfer("second", 2, "third", operation)
         assert conn.execute("SELECT holder,generation FROM fleet_writer.authority").fetchone() == ("second", 2)

@@ -97,6 +97,9 @@ FOR EACH STATEMENT EXECUTE FUNCTION e1.reject_change();
 CREATE FUNCTION fleet_writer.guard_transfer() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog AS $$
 BEGIN
+    IF TG_OP = 'INSERT' THEN
+        RAISE EXCEPTION 'authenticated genesis unavailable';
+    END IF;
     IF TG_OP <> 'UPDATE' THEN RAISE EXCEPTION 'authority deletion forbidden'; END IF;
     IF NEW.tenant_id <> OLD.tenant_id OR NEW.generation <> OLD.generation + 1 THEN
         RAISE EXCEPTION 'authority transfer requires next generation';
@@ -107,7 +110,7 @@ BEGIN
     END IF;
     RETURN NEW;
 END $$;
-CREATE TRIGGER guard_transfer BEFORE UPDATE OR DELETE ON fleet_writer.authority
+CREATE TRIGGER guard_transfer BEFORE INSERT OR UPDATE OR DELETE ON fleet_writer.authority
 FOR EACH ROW EXECUTE FUNCTION fleet_writer.guard_transfer();
 CREATE FUNCTION fleet_writer.record_transfer() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog AS $$
