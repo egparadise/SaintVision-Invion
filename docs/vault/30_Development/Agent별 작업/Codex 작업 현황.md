@@ -2532,3 +2532,9 @@ AOA-05 follow-up: the old 18 setup errors had two distinct causes: unset CX01_CO
 - Claude F1~F5 보강 head `abe8435a`: shallow Backend 분리, future reversible 기준 DB 비교, 임시 Alembic 부정 fixture 3종, AC-11 importer/target registry, 좁은 CHECK 정규화를 추가했다. hosted run `36379743674`는 JUnit 6/0/0/1 skip·disposable DB 7개 residue 0·artifact `10952510591`로 PASS했고, PG-free 75 passed와 문서/ontology/contract/ratchet 게이트 exit 0이다. 단일 hosted restore 축만의 증거이며 새 cluster role·운영 PITR·물리 복구는 미측정이다.
 - Claude r2 N1~N4 대응: importer가 artifact zip을 직접 hash하고 zip 내부 report/JUnit 및 GitHub run/artifact metadata의 run ID·head·결론·이름·만료를 exact 대조한다. 정본 artifact 재수입은 expected/observed `d4437410…`·report `cfa3b678…`·JUnit `1cbc2ffe…`, exit 0이며 임의 digest/failed·expired·head/run drift/sourceRunId 누락/JUnit 실패를 거부한다. 0009는 23505와 rollback state를 요구하고 JUnit은 negative case 실제 실행을 반영하며, PG-free focused 87 passed다.
 - Claude r3 조건부 승인 N5/N6 경계: 정본 hosted run `36379743674`는 느슨한 0009 판정이 있던 `abe8435a` 산출물이고, `b2b4db3c`의 N2/N3 강화는 PG-free만 검증돼 release 전 lane 재실행이 필요하다. importer는 `gh api`로 취득한 zip/run/artifact JSON의 상호 결속을 검사하지만 metadata 출처를 인증하지 않으므로, canonical repository 조회 명령·artifact id `10952510591`·일관된 입력 위조 한계를 History와 docstring에 고정했다.
+
+E1 PC1 reservation prerequisite on unified 433ea326, disposable PostgreSQL verified. Independent review pending. Operational HOLD pending shared authority. [[2026-11-19_FLEET5_E1_PC1_Reservation]]
+E1 follow-up task_3cfbc21d5762 checks all-history uniqueness, A7, tenant RLS, atomic audit/replay and unchanged membership. No assigned production migration. [[2026-11-19_FLEET5_E1_PC1_Reservation]]
+- E1 shared PostgreSQL candidate, disposable suite 10 passed, independent review pending. [[2026-11-19_E1_Shared_PostgreSQL_Fence]]
+
+2026-11-19T09:39+09:00 task_513787a85681 ? E1 G1/F2/G2 local PostgreSQL and integrity regressions 28 passed. HOLD. Coordinator owns hosted exact-SHA evidence and independent review. [[2026-11-19_E1_Shared_PostgreSQL_Fence]]
