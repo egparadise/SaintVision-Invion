@@ -98,6 +98,21 @@ def test_pc1_transactions(e1_database):
                            lock_authority=expires_before_commit) == "HOLD_WRITER_FENCE"
         assert conn.execute("SELECT count(*) FROM e1.reservations").fetchone() == (0,)
         assert conn.execute("SELECT count(*) FROM e1.reservation_audit").fetchone() == (0,)
+        # Seed an incomplete legacy receipt with ordinary INSERT privileges.
+        digest = canonical_digest(binding)
+        for surviving_table in ("audit", "journal"):
+            with conn.transaction(force_rollback=True):
+                conn.execute("""INSERT INTO e1.reservations VALUES
+                    (%s,'PC1',%s,%s,'first',1,%s,%s,%s,%s,%s)""",
+                    (tenant, binding["nodeID"], request, psycopg.types.json.Jsonb(binding),
+                     digest, evidence["plannedPublicKey"], evidence["manifest"], evidence["operation"]))
+                receipt = (tenant, evidence["operation"], evidence["manifest"], digest)
+                if surviving_table == "audit":
+                    conn.execute("INSERT INTO e1.reservation_audit VALUES (%s,%s,%s,%s)", receipt)
+                else:
+                    conn.execute("""INSERT INTO fleet_writer.journal VALUES
+                        (%s,%s,'E1','first',1,%s,%s)""", receipt)
+                assert reserve(conn) == "HOLD_RESERVATION_MISMATCH"
         barrier = Barrier(3, timeout=10)
 
         def compete(key):
@@ -118,18 +133,8 @@ def test_pc1_transactions(e1_database):
         with conn.transaction(force_rollback=True):
             with pytest.raises(psycopg.errors.RaiseException, match="immutable"), conn.transaction():
                 conn.execute("TRUNCATE fleet_writer.journal")
-            # Simulate historic corruption inside a rolled-back, owner-only fixture.
-            conn.execute("ALTER TABLE fleet_writer.journal DISABLE TRIGGER immutable_truncate")
-            conn.execute("TRUNCATE fleet_writer.journal")
-            assert reserve(conn, winner) == "HOLD_RESERVATION_MISMATCH"
-        with conn.transaction(force_rollback=True):
             with pytest.raises(psycopg.errors.RaiseException, match="immutable"), conn.transaction():
                 conn.execute("TRUNCATE e1.reservation_audit")
-            # Simulate historic corruption inside a rolled-back, owner-only fixture.
-            conn.execute("ALTER TABLE e1.reservation_audit DISABLE TRIGGER immutable_truncate")
-            conn.execute("TRUNCATE e1.reservation_audit")
-            assert reserve(conn, winner) == "HOLD_RESERVATION_MISMATCH"
-            assert conn.execute("SELECT count(*) FROM e1.reservation_audit").fetchone() == (0,)
         with conn.transaction(force_rollback=True):
             conn.execute("UPDATE e1.test_authority SET expires_at=clock_timestamp()")
             assert reserve(conn, winner) == "HOLD_WRITER_FENCE"
@@ -143,7 +148,22 @@ def test_pc1_transactions(e1_database):
         # Even when the new body is authorized, the durable request cannot change.
         conn.execute("UPDATE e1.test_authority SET binding=%s", (psycopg.types.json.Jsonb(changed),))
         assert reserve(conn, winner, body=changed) == "HOLD_RESERVATION_MISMATCH"
-        conn.execute("UPDATE fleet_writer.authority SET holder='second',generation=2")
+        def transfer(old, generation, successor, operation):
+            conn.execute("""SELECT fleet_writer.transfer(%s,%s,%s,session_user,%s,%s,%s,%s)""",
+                         (tenant, old, generation, successor, operation,
+                          binding["planDigest"], binding["fenceToken"]))
+
+        operation = uuid4()
+        with conn.transaction(force_rollback=True):
+            transfer("first", 1, "second", operation)
+        assert conn.execute("SELECT count(*) FROM fleet_writer.transfer_journal").fetchone() == (0,)
+        transfer("first", 1, "second", operation)
+        with pytest.raises(psycopg.errors.UniqueViolation), conn.transaction():
+            transfer("second", 2, "third", operation)
+        assert conn.execute("SELECT holder,generation FROM fleet_writer.authority").fetchone() == ("second", 2)
+        assert conn.execute("""SELECT previous_holder,next_holder,actor=session_user,plan_digest,fence_token
+            FROM fleet_writer.transfer_journal""").fetchone() == (
+                "first", "second", True, binding["planDigest"], binding["fenceToken"])
         conn.execute("UPDATE e1.test_authority SET holder='second',generation=2")
         assert reserve(conn, winner) == "HOLD_WRITER_FENCE"
         assert reserve(conn, winner, writer="second") == "HOLD_WRITER_FENCE"
@@ -161,7 +181,7 @@ def test_pc1_transactions(e1_database):
 
             with ThreadPoolExecutor(1) as workers:
                 with conn.transaction():
-                    conn.execute("UPDATE fleet_writer.authority SET generation=3")
+                    transfer("second", 2, "third", uuid4())
                     pending = workers.submit(stale_retry)
                     assert entered.wait(5)
                     deadline = time.monotonic() + 5
@@ -205,7 +225,8 @@ def test_pc1_transactions(e1_database):
 
 
 @pytest.mark.parametrize("case", ["retired-key", "disabled-node", "rotation-key", "stale-digest",
-                                   "missing-history", "foreign-A7", "missing-A7", "wrong-epoch"])
+                                   "missing-history", "foreign-A7", "missing-A7", "wrong-epoch",
+                                   "duplicate-node", "duplicate-key", "unknown-status", "foreign-rotation"])
 def test_ineligible_history_or_checkpoint(case):
     binding = json.loads((CONTRACT / "p14-reservation.json").read_text())
     inputs = json.loads((CONTRACT / "p14-inputs.json").read_text())
@@ -214,7 +235,15 @@ def test_ineligible_history_or_checkpoint(case):
     evidence = dict(inputs, authenticatedAllHistory=True, freshFence=True,
                     plannedPublicKey=csr_key(inputs["csrDER"], binding["csrSHA256"]), epoch=binding["epoch"], operation="E1",
                     a7=[binding["planDigest"], inputs["manifest"], "COMMITTED"])
-    if case == "retired-key":
+    if case == "duplicate-node":
+        inputs["rows"][-1]["nodeID"] = inputs["rows"][0]["nodeID"]
+    elif case == "duplicate-key":
+        inputs["rows"][-1]["publicKeySHA256"] = inputs["rows"][0]["publicKeySHA256"]
+    elif case == "unknown-status":
+        inputs["rows"][-1]["status"] = "unknown"
+    elif case == "foreign-rotation":
+        evidence["rotationKeys"][0] = inputs["rows"][-1]["publicKeySHA256"]
+    elif case == "retired-key":
         inputs["rows"][0].update(status="RETIRED", publicKeySHA256=key)
     elif case == "disabled-node":
         inputs["rows"][0].update(status="DISABLED", nodeID=binding["nodeID"])

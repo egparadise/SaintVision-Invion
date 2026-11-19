@@ -58,14 +58,26 @@ def eligible(binding, evidence, key):
             or any(not isinstance(k, str) or not re.fullmatch("[0-9a-f]{64}", k) for k in rotation)
             or evidence.get("plannedPublicKey") != key or key in rotation or canonical_digest(rows) != binding["rowsReadbackSHA256"]):
         return False
+    nodes = set()
+    keys = set()
+    active = {}
     for row in rows:
-        if (not isinstance(row, dict) or not row.get("nodeID") or not row.get("status")
+        if (not isinstance(row, dict) or not isinstance(row.get("nodeID"), str) or not row["nodeID"]
+                or row.get("status") not in ("ACTIVE", "RETIRED", "DISABLED")
                 or any(not isinstance(row.get(field), str)
                        or not re.fullmatch("[0-9a-f]{64}", row[field])
                        for field in ("publicKeySHA256", "channelCertificateSHA256"))
                 or PC1 == row["nodeID"] or key == row["publicKeySHA256"]):
             return False
-    return True
+        node, public = row["nodeID"], row["publicKeySHA256"]
+        if node in nodes or public in keys:
+            return False
+        nodes.add(node)
+        keys.add(public)
+        if row["status"] == "ACTIVE":
+            active[node] = public
+    rotation_nodes = [PC1[:-1] + suffix for suffix in ("2", "3", "4")]
+    return set(rotation) == {active.get(node) for node in rotation_nodes} and len(set(rotation)) == 3
 
 
 def reserve_pc1(conn, request_id, holder, generation, binding, *, csr_der=None, lock_authority=None):

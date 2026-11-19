@@ -66,8 +66,34 @@ CREATE TABLE fleet_writer.authority (
     login name NOT NULL,
     holder text NOT NULL CHECK (length(trim(holder)) > 0),
     generation bigint NOT NULL CHECK (generation > 0),
+    transfer_id uuid,
+    plan_digest text CHECK (plan_digest ~ '^[0-9a-f]{64}$'),
+    fence_token text CHECK (length(trim(fence_token)) > 0),
     FOREIGN KEY (login, tenant_id) REFERENCES fleet_writer.principals(login, tenant_id)
 );
+CREATE TABLE fleet_writer.transfer_journal (
+    tenant_id uuid NOT NULL,
+    transfer_id uuid NOT NULL,
+    actor name NOT NULL,
+    previous_holder text NOT NULL,
+    previous_generation bigint NOT NULL,
+    next_login name NOT NULL,
+    next_holder text NOT NULL,
+    next_generation bigint NOT NULL,
+    plan_digest text NOT NULL,
+    fence_token text NOT NULL,
+    PRIMARY KEY (tenant_id, transfer_id),
+    UNIQUE (tenant_id, next_generation)
+);
+ALTER TABLE fleet_writer.transfer_journal ENABLE ROW LEVEL SECURITY;
+ALTER TABLE fleet_writer.transfer_journal FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_scope ON fleet_writer.transfer_journal
+    USING (tenant_id = fleet_writer.authenticated_tenant()
+           AND tenant_id::text = current_setting('inv.tenant_id', true));
+CREATE TRIGGER immutable BEFORE UPDATE OR DELETE ON fleet_writer.transfer_journal
+FOR EACH ROW EXECUTE FUNCTION e1.reject_change();
+CREATE TRIGGER immutable_truncate BEFORE TRUNCATE ON fleet_writer.transfer_journal
+FOR EACH STATEMENT EXECUTE FUNCTION e1.reject_change();
 CREATE FUNCTION fleet_writer.guard_transfer() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog AS $$
 BEGIN
@@ -75,10 +101,33 @@ BEGIN
     IF NEW.tenant_id <> OLD.tenant_id OR NEW.generation <> OLD.generation + 1 THEN
         RAISE EXCEPTION 'authority transfer requires next generation';
     END IF;
+    IF OLD.login <> session_user OR OLD.tenant_id IS DISTINCT FROM fleet_writer.authenticated_tenant()
+       OR OLD.tenant_id::text IS DISTINCT FROM current_setting('inv.tenant_id', true) THEN
+        RAISE EXCEPTION 'unauthorized transfer';
+    END IF;
     RETURN NEW;
 END $$;
 CREATE TRIGGER guard_transfer BEFORE UPDATE OR DELETE ON fleet_writer.authority
 FOR EACH ROW EXECUTE FUNCTION fleet_writer.guard_transfer();
+CREATE FUNCTION fleet_writer.record_transfer() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog AS $$
+BEGIN
+    INSERT INTO fleet_writer.transfer_journal VALUES
+        (NEW.tenant_id, NEW.transfer_id, session_user, OLD.holder, OLD.generation,
+         NEW.login, NEW.holder, NEW.generation, NEW.plan_digest, NEW.fence_token);
+    RETURN NULL;
+END $$;
+CREATE TRIGGER record_transfer AFTER UPDATE ON fleet_writer.authority
+FOR EACH ROW EXECUTE FUNCTION fleet_writer.record_transfer();
+CREATE FUNCTION fleet_writer.transfer(scope uuid, expected_holder text, expected_generation bigint,
+    successor name, next_holder text, operation uuid, plan text, token text) RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog AS $$
+BEGIN
+    UPDATE fleet_writer.authority SET login=successor, holder=next_holder, generation=generation+1,
+        transfer_id=operation, plan_digest=plan, fence_token=token
+    WHERE tenant_id=scope AND login=session_user AND holder=expected_holder AND generation=expected_generation;
+    IF NOT FOUND THEN RAISE EXCEPTION 'stale or unauthorized transfer'; END IF;
+END $$;
 CREATE FUNCTION fleet_writer.lock_holder(scope uuid)
 RETURNS TABLE(holder text, generation bigint)
 LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path = pg_catalog AS $$
